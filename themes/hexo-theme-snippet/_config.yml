@@ -1,0 +1,172 @@
+# ---------------------------------------------------------------
+#   Site Information And Theme Configuration Settings
+#   language: zh-CN
+# ---------------------------------------------------------------
+
+## menu
+menu:
+- page: home
+  url: /
+  icon:
+- page: python
+  url: /tags/python/
+  icon:
+- page: 大数据
+  url: /tags/大数据/
+  icon:
+- page: 生活
+  url: /tags/生活/
+  icon:
+- page: 时间轴
+  url: /archives/
+  icon:
+
+## favicon
+favicon: /img/favicon.ico
+
+## Feed
+rss: /atom.xml
+
+## Carousel
+carousel:
+  img: img/head-img.jpg
+
+# 各个小工具的设置
+
+## widgets
+widgets:
+  - search
+  - notification
+  - social
+  - category
+  - archive
+  - tagcloud
+  - friends
+
+## 搜索
+jsonContent:
+  searchLocal: true
+  searchGoogle: false
+  posts:
+    title: true
+    text: true
+    content: true
+    categories: false
+    tags: false
+
+
+## 社交设置
+social:
+ - name: Github
+   icon: git
+   href: https://github.com/LiuHaiYang
+ - name: 邮箱
+   icon: envelope-o
+   href: mailto:oceango@126.com
+ - name: 联系QQ
+   icon: qq
+ - name: 微信
+   icon: weixin
+ - name: QQ群
+   icon: users
+ - name: RSS
+   icon: feed
+   #href: /atom.xml
+
+## 文章分类设置
+cate_config:
+   show_count: true
+   show_current: true
+
+## 文章归档设置
+arch_config:
+   type: 'monthly'
+   show_count: true
+   order: -1
+
+## 友链设置
+links:
+  - 个人博客: https://liuhaiyang.github.io
+
+
+# 主题自定义个性化配置
+
+## 网站宣传语
+branding: Always believe youself.
+## 设置banner背景图片
+banner:
+    img: img/banner.jpg
+
+## 首页列表底部面板
+homePanel: true
+
+## 缩略图自定义随机图片
+defaultImgs:
+  -
+
+## 截取文章首页描述字数
+excerptLength: 120
+
+## 是否开启文章目录
+toc: true
+
+## 代码高亮配置
+highlightTheme:
+
+## bootstrap配置
+bootstrap:
+
+## ICON配置
+fontAwesome:
+
+## 文章过期提醒功能
+warning:
+  days: 600
+  text: '本文于%d天之前发表，文中内容可能已经过时。'
+
+## 文章内声明
+declaration:
+  enable: true
+  title: '转载声明'
+  tip: |-
+      商业转载请联系作者获得授权,非商业转载请注明出处 ,图片资源转自pexels © <a href="" target="_blank">Ocean</a>
+
+
+## 主题评论
+
+### gitment
+gitment:
+  enable: true
+  owner: 'LiuHaiYang'
+  repo: 'liuhaiyang.github.io'
+  client_id: 'aacf4f5555aee5bf0770'
+  client_secret: '07f91d5b66c30419c14d14349ccadaa91300bc9c'
+  perPage: 10
+
+
+## 网站访客统计 [不蒜子统计](http://busuanzi.ibruce.info/)
+visit_counter:
+   site: true // 总访问量和访问人数统计
+   page: true // 文章阅读量统计
+
+## 网站访问统计
+
+### 网盟CNZZ统计 参考网站: [网盟CNZZ](http://www.umeng.com/)
+cnzz_anaylytics:
+
+### 百度统计 参考网站: [百度统计](https://tongji.baidu.com/)
+baidu_anaylytics: 6bd123c6d9324febf6315050b1fc039c
+
+### 谷歌统计 参考网站：[谷歌统计](https://www.google-analytics.com/)
+google_anaylytics:
+
+### 腾讯分析 参考网站：[腾讯分析](http://ta.qq.com/)
+tencent_analytics:
+
+
+
+
+#网站主题配置
+since: 2019
+robot: 'all' ### 控制搜索引擎的抓取和索引编制行为，默认为all
+version: 1.2.1
