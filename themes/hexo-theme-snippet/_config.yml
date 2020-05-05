@@ -11,8 +11,8 @@ menu:
 - page: python
   url: /tags/python/
   icon:
-- page: 大数据
-  url: /tags/大数据/
+- page: JAVA
+  url: /tags/java/
   icon:
 - page: 生活
   url: /tags/生活/
