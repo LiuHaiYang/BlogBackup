@@ -38,7 +38,111 @@ redis 配置：
 | `save <seconds> <changes>`Redis 默认配置文件中提供了三个条件：save 900 1 save 300 10save 60 10000 分别表示 900 秒（15 分钟）内有 1 个更改，300 秒（5 分钟）内有 10 个更改以及 60 秒内有 10000 个更改。|指定在多长时间内，有多少次更新操作，就将数据同步到数据文件，可以多个条件配合|
 |`slaveof <masterip> <masterport>`|设置当本机为 slave 服务时，设置 master 服务的 IP 地址及端口，在 Redis 启动时，它会自动从 master 进行数据同步|
 |appendfsync everysec	|指定更新日志条件，共有 3 个可选值： no：表示等操作系统进行数据缓存同步到磁盘（快） always：表示每次更新操作后手动调用 fsync() 将数据写到磁盘（慢，安全） everysec：表示每秒同步一次（折中，默认值）|
-|||
-|||
-|||
-|||
+|`vm-enabled no`|指定是否启用虚拟内存机制，默认值为 no，简单的介绍一下，VM 机制将数据分页存放，由 Redis 将访问量较少的页即冷数据 swap 到磁盘上，访问多的页面由磁盘自动换出到内存中（在后面的文章我会仔细分析 Redis 的 VM 机制）|
+
+redis数据类型：
+redis支持五种数据类型：String（字符串），hash（哈希），list（列表），set（集合）及zset（sorted set）有序集合。
+
+String（字符串）
+string 是redis 最基本的类型，你可以理解成与Memached 一模一样的类型，一个 key 对应一个 value。
+string 类型是二进制安全的，意思是 redis 的string 可以包含任何数据，比如jpg图片或者序列化的对象。
+string 类型是redis最基本的数据类型，string 类型的值最大能存储512MB。
+
+'''
+set key value
+get key
+'''
+Hash(哈希)
+redis hash 是一个键值（key value） 对集合。
+redis hash 是一个string 类型的 field 和 value的映射表，hash 特别适合用于存储对象。
+del key 删除key
+HMSET key field1 value1 field2 value2
+HGET key field1
+
+实例中我们使用了redis HMSET HGET 命令，HMSET 设置了两个 field => value 对，HGET 获取field对应的value。
+每个hash 可以存储 2 ** 32-1键值对（40多亿）
+
+List（列表）
+
+redis 列表是简单的字符串列表，按照插入顺序排序，你可以添加一个元素到列表的头部（左边）或者尾部（右边）。
+
+'''
+lpush key value
+lrange key 0 10
+'''
+
+Set (集合)
+redis 的set是string类型的无序集合
+集合是通过hash表实现的，所以添加，删除，查找的复杂度都是 O(1).
+
+sadd命令
+添加一个string 元素到key对应的set集合中，成功返回1，如果元素已经在集合中返回0.
+
+'''
+sadd key value
+smembers key
+'''
+
+注意：如果实例被添加两次，但根据集合内元素的唯一性，第二次插入元素将被忽略。
+集合中最大的成员数为2 ** 32 -1 （最多40多亿个成员）
+
+Zset （sorted set 有序集合）
+redis zset 和 set 一样，也是string类型元素的集合，且不允许重复的成员。
+不同的每个成员元素都会关联一个double类型的分数，redis正是通过分数来为集合中的成员进行从小到大的排序。
+zset 的成员是唯一的，但是分数（score）却可以重复。
+
+zadd 命令：添加元素到集合，元素在集合中存在则更新对应score。
+
+'''
+zadd runoob 0 redis
+zadd runoob 0 rabitmq
+ZRANGEBYSCORE runoob 0 1000
+'''
+
+---
+
+redis 命令
+
+redis client： redis-cli -h host -p port -a pwd
+PING -> PONG
+
+---
+
+redis 键（key）
+
+redis 键命令用于管理redis的键。
+'''
+set
+get
+del 如果键被删除成功，命令执行后输出 (integer) 1，否则将输出 (integer) 0
+'''
+
+|序号|命令|描述|
+|----|----|----|
+|1| DEL key |该命令用于在 key 存在时删除 key。|
+|2| DUMP key | 序列化给定 key ，并返回被序列化的值。 |
+|3 | 	EXISTS key | 检查给定 key 是否存在。|
+|4 | EXPIRE key seconds | 为给定 key 设置过期时间，以秒计。|
+|5 | KEYS pattern | 查找所有符合给定模式( pattern)的 key 。|
+|6 | PERSIST key | 移除 key 的过期时间，key 将持久保持。|
+|7| PTTL key | 以毫秒为单位返回 key 的剩余的过期时间。|
+|8| RENAME key newkey | 修改 key 的名称 |
+
+---
+redis 字符串（String）
+
+'''
+SET key value
+GET key
+GETRANGE key start end  返回 key 中字符串值的子字符
+GETSET key value 将给定 key 的值设为 value ，并返回 key 的旧值(old value)。
+'''
+
+
+
+
+
+
+
+
+
