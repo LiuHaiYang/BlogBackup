@@ -1,7 +1,7 @@
 ---
 title: Maven入门
 date: 2019-11-02 13:50:20
-tags: waven
+tags: maven
 ---
 
 ### 项目构建(maven可以干的事)

@@ -4,6 +4,8 @@ date: 2021-01-25 21:09:27
 tags: python
 ---
 
+	pthon demo
+
 	from functools import lru_cache
 	@lru_cache(100)
 	def fib(n):
@@ -12,9 +14,11 @@ tags: python
 	    else:
 	        return fib(n - 1) + fib(n - 2)
 
-使用lru_cache的效率是最高的，直接递归的效率低的惊人，毕竟是指数级别的时间复杂度。
+	使用lru_cache的效率是最高的，直接递归的效率低的惊人，毕竟是指数级别的时间复杂度。
 
-lru_cache比起成熟的缓存系统还有些不足之处，比如它不能设置缓存的时间，只能等到空间占满后再利用LRU算法淘汰出空间出来，并且不能自定义淘汰算法，但在简单的场景中很适合使
+	lru_cache比起成熟的缓存系统还有些不足之处
+	= 它不能设置缓存的时间，只能等到空间占满后再利用LRU算法淘汰出空间出来，
+	= 不能自定义淘汰算法，但在简单的场景中很适合使
 
 
 ### 什么是LRU
@@ -25,11 +29,45 @@ LRU Cache是一个Cache置换算法，（least recently use）含义是“最近
 
 #### 要求
 
-提供两个接口：一个获取数据int get(int key),一个写入数据void set(int key, int value)。
+提供两个接口：一个获取数据int get(int key),一个写入数据void put(int key, int value)。get 和 put 方法必须都是 O(1) 的时间复杂度，
 
 无论获取数据还是写入数据，这个数据要保持在最容易访问的位置。
 
 缓存的数据大小有限，当缓存满时置换出最长时间没有被访问的数据，否则直接把数据加入缓存即可。
+
+LRU 算法实际上是让你设计数据结构：首先要接收一个 capacity 参数作为缓存的最大容量，然后实现两个 API，一个是 put(key, val) 方法存入键值对，另一个是 get(key) 方法获取 key 对应的 val，如果 key 不存在则返回 -1。
+
+
+#### DEMO 
+
+	/* 缓存容量为 2 */
+	LRUCache cache = new LRUCache(2);
+	// 你可以把 cache 理解成一个队列
+	// 假设左边是队头，右边是队尾
+	// 最近使用的排在队头，久未使用的排在队尾
+	// 圆括号表示键值对 (key, val)
+
+	cache.put(1, 1);
+	// cache = [(1, 1)]
+	cache.put(2, 2);
+	// cache = [(2, 2), (1, 1)]
+	cache.get(1);       // 返回 1
+	// cache = [(1, 1), (2, 2)]
+	// 解释：因为最近访问了键 1，所以提前至队头
+	// 返回键 1 对应的值 1
+	cache.put(3, 3);
+	// cache = [(3, 3), (1, 1)]
+	// 解释：缓存容量已满，需要删除内容空出位置
+	// 优先删除久未使用的数据，也就是队尾的数据
+	// 然后把新的数据插入队头
+	cache.get(2);       // 返回 -1 (未找到)
+	// cache = [(3, 3), (1, 1)]
+	// 解释：cache 中不存在键为 2 的数据
+	cache.put(1, 4);    
+	// cache = [(1, 4), (3, 3)]
+	// 解释：键 1 已存在，把原始值 1 覆盖为 4
+	// 不要忘了也要将键值对提前到队头
+
 
 #### 算法
 
@@ -47,58 +85,65 @@ LRU Cache是一个Cache置换算法，（least recently use）含义是“最近
 
 ### LRU实现
 
-实现方案：使用stl的map和list
-这里map使用unordered_map（hashmap）+list(双向链表），因此本质上使用hashmap和双向链表
+#### java 版本
 
-	class LRUCache{
-	    int m_capacity;
-	    
-	    //m_map_iter->first: key, m_map_iter->second: list iterator;
-	    unordered_map<int,  list<pair<int, int>>::iterator> m_map; 
-	    
-	    //m_list_iter->first: key, m_list_iter->second: value;
-	    list<pair<int, int>> m_list;                              
-	public:
-	    LRUCache(int capacity): m_capacity(capacity) {
-	      
+	class LRUCache {
+	    int capacity;
+	    LinkedHashMap<Integer, Integer> cache;
+
+	    public LRUCache(int capacity) {
+	        this.capacity = capacity;
+	        cache = new LinkedHashMap<Integer, Integer>(capacity, 0.75f, true) {
+	            @Override
+	            protected boolean removeEldestEntry(Map.Entry eldest) {
+	                return cache.size() > capacity;
+	            }
+	        };
 	    }
-	    
-	    int get(int key) {
-	        auto found_iter = m_map.find(key);
-	        // key 不存在
-	        if (found_iter == m_map.end()) 
-	            return -1;
-	        
-	        // key存在时，更新list的key所在节点的位置为list第一元素
-	        m_list.splice(m_list.begin(), m_list, found_iter->second); 
-	        
-	        return found_iter->second->second; 
+
+	    public int get(int key) {
+	        return cache.getOrDefault(key, -1);
 	    }
-	    
-	    void set(int key, int value) {
-	        auto found_iter = m_map.find(key);
-	        // key存在
-	        if (found_iter != m_map.end()) 
-	        {
-	            // 移动key所在list中的位置
-	            m_list.splice(m_list.begin(), m_list, found_iter->second); 
-	            // 更新值
-	            found_iter->second->second = value; 
-	            return;
-	        }
-	        // 缓存已满且key不存在，删除list中最后一个节点，并从map中删除该key；
-	        // 注意：这里就是为什么list存储的是key和value 键值对的原因，需要删除map中指定key
-	        if (m_map.size() == m_capacity) 
-	        {
-	           int key_to_del = m_list.back().first; 
-	           m_list.pop_back();           
-	           m_map.erase(key_to_del);  
-	        }
-	        // 缓存不满，list把key和value加入到list的第一个位置，并存储到map中
-	        m_list.emplace_front(key, value); 
-	        m_map[key] = m_list.begin();      
+
+	    public void put(int key, int value) {
+	        cache.put(key, value);
 	    }
-	};
+	}
+
+#### PYTHON DEMO
+
+	"""
+	所谓LRU缓存，根本的难点在于记录最久被使用的键值对，这就设计到排序的问题，
+	在python中，天生具备排序功能的字典就是OrderDict。
+	注意到，记录最久未被使用的键值对的充要条件是将每一次put/get的键值对都定义为
+	最近访问，那么最久未被使用的键值对自然就会排到最后。
+	如果你深入python OrderDict的底层实现，就会知道它的本质是个双向链表+字典。
+	它内置支持了
+	1. move_to_end来重排链表顺序，它可以让我们将最近访问的键值对放到最后面
+	2. popitem来弹出键值对，它既可以弹出最近的，也可以弹出最远的，弹出最远的就是我们要的操作。
+	"""
+	
+	from collections import OrderedDict
+	class LRUCache:
+	  def __init__(self, capacity: int):
+	    self.capacity = capacity  # cache的容量
+	    self.visited = OrderedDict()  # python内置的OrderDict具备排序的功能
+	    
+	  def get(self, key: int) -> int:
+	    if key not in self.visited:
+	      return -1
+	    self.visited.move_to_end(key)  # 最近访问的放到链表最后，维护好顺序
+	    return self.visited[key]
+
+	  def put(self, key: int, value: int) -> None:
+	    if key not in self.visited and len(self.visited) == self.capacity:
+	      # last=False时，按照FIFO顺序弹出键值对
+	      # 因为我们将最近访问的放到最后，所以最远访问的就是最前的，也就是最first的，故要用FIFO顺序
+	      self.visited.popitem(last=False)
+	      self.visited[key]=value
+	      self.visited.move_to_end(key)    # 最近访问的放到链表最后，维护好顺序
+
+
 
 ### 涉及的数据结构
 std::map：主要用于实现快速访问（logn），存储key对应的list的位置信息，这里对应key对应list的迭代器
